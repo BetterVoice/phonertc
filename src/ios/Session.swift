@@ -39,8 +39,8 @@ class Session {
             ]
         )
     }
-    
-    func call() {
+
+    func init() {
         // create a list of ICE servers
         var iceServers: [RTCICEServer] = []
         iceServers.append(RTCICEServer(
@@ -62,11 +62,13 @@ class Session {
         
         // create a media stream and add audio and/or video tracks
         createOrUpdateStream()
-        
+    }
+    
+    func call(isInitiator: Bool) {
         // create offer if initiator
-        if self.config.isInitiator {
+        if isInitiator {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
-                constraints: constraints)
+                constraints: self.constraints)
         }
     }
     
