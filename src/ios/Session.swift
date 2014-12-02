@@ -66,6 +66,7 @@ class Session {
     
     func call(isInitiator: Bool) {
         // create offer if initiator
+        self.config.isInitiator = isInitiator
         if isInitiator {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
                 constraints: self.constraints)
