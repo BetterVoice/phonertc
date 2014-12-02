@@ -47,12 +47,12 @@ class PhoneRTCPlugin : CDVPlugin {
         }
     }
 
-    func init(command: CDVInvokedUrlCommand) {
+    func initialize(command: CDVInvokedUrlCommand) {
         let args: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = args.objectForKey("sessionKey") as? String {
             dispatch_async(dispatch_get_main_queue()) {
                 if (self.sessions[sessionKey] != nil) {
-                    self.sessions[sessionKey]!.init()
+                    self.sessions[sessionKey]!.initialize()
                 }
             }
         }

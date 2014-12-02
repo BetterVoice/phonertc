@@ -40,7 +40,7 @@ class Session {
         )
     }
 
-    func init() {
+    func initialize() {
         // create a list of ICE servers
         var iceServers: [RTCICEServer] = []
         iceServers.append(RTCICEServer(
