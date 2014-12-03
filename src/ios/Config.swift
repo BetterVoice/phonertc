@@ -1,12 +1,10 @@
 import Foundation
 
 class SessionConfig {
-    var isInitiator: Bool
     var turn: TurnConfig
     var streams: StreamsConfig
     
     init(data: AnyObject) {
-        self.isInitiator = false
         let turnObject: AnyObject = data.objectForKey("turn")!
         self.turn = TurnConfig(
             host: turnObject.objectForKey("host") as String,
