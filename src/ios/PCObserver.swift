@@ -50,7 +50,7 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
         var jsonError: NSError?
 
         let json: AnyObject = [
-            "type": "candidate",
+            "type": "__candidate",
             "label": candidate.sdpMLineIndex,
             "id": candidate.sdpMid,
             "candidate": candidate.sdp
