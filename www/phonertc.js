@@ -60,10 +60,8 @@ function Session(config) {
   function onSendMessage(data) {
     if (data.type === '__answered') {
       callEvent('answer');
-    } else if(data.type === '__disconnected') {
+    } else if (data.type === '__disconnected') {
       callEvent('disconnect');
-    } else if(data.type === '__candidate') {
-      callEvent('candidate', data);
     } else {
       callEvent('sendMessage', data);
     }
@@ -133,7 +131,7 @@ Session.prototype.call = function (isInitiator) {
 };
 
 Session.prototype.init = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'initialize', [{ 
+  exec(null, null, 'PhoneRTCPlugin', 'init', [{ 
     'sessionKey': this.sessionKey
   }]);
 };
