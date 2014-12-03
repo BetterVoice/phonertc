@@ -18,18 +18,19 @@ function createUUID() {
 
 function Session(config) { 
   // make sure that the config object is valid
-  if(typeof config !== 'object') {
+  if (typeof config !== 'object') {
     throw {
-      'name': 'PhoneRTC Error',
-      'message': 'The first argument must be an object.'
+      name: 'PhoneRTC Error',
+      message: 'The first argument must be an object.'
     };
   }
 
-  if(typeof config.turn === 'undefined' ||
+  if (typeof config.isInitiator === 'undefined' ||
+      typeof config.turn === 'undefined' ||
       typeof config.streams === 'undefined') {
     throw {
-      'name': 'PhoneRTC Error',
-      'message': 'isInitiator, turn and streams are required parameters.'
+      name: 'PhoneRTC Error',
+      message: 'isInitiator, turn and streams are required parameters.'
     };
   }
 
@@ -41,8 +42,8 @@ function Session(config) {
   // make all config properties accessible from this object
   Object.keys(config).forEach(function (prop) {
     Object.defineProperty(self, prop, {
-      'get': function () { return self.config[prop]; },
-      'set': function (value) { self.config[prop] = value; }
+      get: function () { return self.config[prop]; },
+      set: function (value) { self.config[prop] = value; }
     });
   });
 
@@ -74,8 +75,8 @@ Session.prototype.on = function (eventName, fn) {
   // make sure that the second argument is a function
   if (typeof fn !== 'function') {
     throw {
-      'name': 'PhoneRTC Error',
-      'message': 'The second argument must be a function.'
+      name: 'PhoneRTC Error',
+      message: 'The second argument must be a function.'
     };
   }
 
@@ -87,8 +88,8 @@ Session.prototype.on = function (eventName, fn) {
     for (var i = 0, len = this.events[eventName].length; i < len; i++) {
       if (this.events[eventName][i] === fn) {
         throw {
-          'name': 'PhoneRTC Error',
-          'message': 'This callback function was already added.'
+          name: 'PhoneRTC Error',
+          message: 'This callback function was already added.'
         };
       }
     }
@@ -102,8 +103,8 @@ Session.prototype.off = function (eventName, fn) {
   // make sure that the second argument is a function
   if (typeof fn !== 'function') {
     throw {
-      'name': 'PhoneRTC Error',
-      'message': 'The second argument must be a function.'
+      name: 'PhoneRTC Error',
+      message: 'The second argument must be a function.'
     };
   }
 
@@ -123,36 +124,29 @@ Session.prototype.off = function (eventName, fn) {
   })
 };
 
-Session.prototype.call = function (isInitiator) {
+Session.prototype.call = function () {
   exec(null, null, 'PhoneRTCPlugin', 'call', [{
-    'sessionKey': this.sessionKey,
-    'isInitiator': isInitiator
-  }]);
-};
-
-Session.prototype.init = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'init', [{ 
-    'sessionKey': this.sessionKey
+    sessionKey: this.sessionKey
   }]);
 };
 
 Session.prototype.receiveMessage = function (data) {
   exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
-    'sessionKey': this.sessionKey,
-    'message': JSON.stringify(data)
+    sessionKey: this.sessionKey,
+    message: JSON.stringify(data)
   }]);
 };
 
 Session.prototype.renegotiate = function () {
   exec(null, null, 'PhoneRTCPlugin', 'renegotiate', [{
-    'sessionKey': this.sessionKey,
-    'config': this.config
+    sessionKey: this.sessionKey,
+    config: this.config
   }]);
 };
 
 Session.prototype.close = function () {
   exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
-    'sessionKey': this.sessionKey
+    sessionKey: this.sessionKey
   }]);
 };
 
