@@ -146,6 +146,20 @@ Session.prototype.renegotiate = function () {
   }]);
 };
 
+Session.prototype.mute = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'toggleMute', [{
+    sessionKey: this.sessionKey,
+    mute: true
+  }]);
+};
+
+Session.prototype.unmute = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'toggleMute', [{
+    sessionKey: this.sessionKey,
+    mute: false
+  }]);
+};
+
 Session.prototype.close = function () {
   exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
     sessionKey: this.sessionKey

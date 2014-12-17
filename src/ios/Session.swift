@@ -98,6 +98,12 @@ class Session {
         
         self.peerConnection.addStream(self.stream, constraints: self.constraints)
     }
+
+    func toggleMute(mute: Bool) {
+        for track in self.stream!.audioTracks {
+            track.enabled = !mute
+        } 
+    }
     
     func receiveMessage(message: String) {
         // Parse the incoming JSON message.
