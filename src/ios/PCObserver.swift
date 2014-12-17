@@ -79,6 +79,6 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
     
     func peerConnectionOnRenegotiationNeeded(peerConnection: RTCPeerConnection!) {
         println("PCO onRenegotiationNeeded.")
-        // TODO: Handle this
+        self.session.sendMessage("{\"type\": \"__renegotiate\"}".dataUsingEncoding(NSUTF8StringEncoding)!)
     }
 }
