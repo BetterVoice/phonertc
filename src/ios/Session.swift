@@ -24,9 +24,16 @@ class Session {
         self.peerConnectionFactory = peerConnectionFactory
         self.callbackId = callbackId
         self.sessionKey = sessionKey
-            
-        // initialize basic media constraints
-        self.constraints = createConstraints(true, false)
+        let mandatory = [
+            RTCPair(key: "OfferToReceiveAudio", value: "true"),
+            RTCPair(key: "OfferToReceiveVideo", value: "false")
+        ]
+        let optional = [
+            RTCPair(key: "internalSctpDataChannels", value: "true"),
+            RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
+        ]
+        self.constraints = RTCMediaConstraints(mandatoryConstraints: mandatory,
+                                               optionalConstraints: optional)
     }
     
     func call() {
@@ -59,17 +66,17 @@ class Session {
         }
     }
 
-    func createConstraints(audio: Bool, video: Bool) {
-        return RTCMediaConstraints(
-            mandatoryConstraints: [
-                RTCPair(key: "OfferToReceiveAudio", value: audio),
-                RTCPair(key: "OfferToReceiveVideo", value: video),
-            ],
-            optionalConstraints: [
-                RTCPair(key: "internalSctpDataChannels", value: "true"),
-                RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
-            ]
-        )
+    func createConstraints(audio: Bool, video: Bool) -> RTCMediaConstraints {
+        let mandatory = [
+            RTCPair(key: "OfferToReceiveAudio", value: audio ? "true" : "false"),
+            RTCPair(key: "OfferToReceiveVideo", value: video ? "true" : "false")
+        ]
+        let optional = [
+            RTCPair(key: "internalSctpDataChannels", value: "true"),
+            RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
+        ]
+        return RTCMediaConstraints(mandatoryConstraints: mandatory,
+                                   optionalConstraints: optional)
     }
     
     func createOrUpdateStream() {
@@ -107,7 +114,7 @@ class Session {
             track.setEnabled(!mute)
         }
         // Update the constraints.
-        self.constraints(false, false)
+        self.constraints = self.createConstraints(true, video: false)
     }
 
     func renegotiate() {
@@ -268,4 +275,3 @@ class Session {
         self.plugin.sendMessage(self.callbackId, message: message)
     }
 }
-

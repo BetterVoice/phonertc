@@ -63,7 +63,6 @@ class PhoneRTCPlugin : CDVPlugin {
         if let sessionKey = args.objectForKey("sessionKey") as? String {
             dispatch_async(dispatch_get_main_queue()) {
                 if let session = self.sessions[sessionKey] {
-                    session.config = SessionConfig(data: config)
                     session.renegotiate()
                 }
             }
