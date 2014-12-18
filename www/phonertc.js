@@ -141,8 +141,7 @@ Session.prototype.receiveMessage = function (data) {
 
 Session.prototype.renegotiate = function () {
   exec(null, null, 'PhoneRTCPlugin', 'renegotiate', [{
-    sessionKey: this.sessionKey,
-    config: this.config
+    sessionKey: this.sessionKey
   }]);
 };
 

@@ -26,18 +26,7 @@ class Session {
         self.sessionKey = sessionKey
             
         // initialize basic media constraints
-        self.constraints = RTCMediaConstraints(
-            mandatoryConstraints: [
-                RTCPair(key: "OfferToReceiveAudio", value: "true"),
-                RTCPair(key: "OfferToReceiveVideo", value:
-                    self.plugin.videoConfig == nil ? "false" : "true"),
-            ],
-            
-            optionalConstraints: [
-                RTCPair(key: "internalSctpDataChannels", value: "true"),
-                RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
-            ]
-        )
+        self.constraints = createConstraints(true, false)
     }
     
     func call() {
@@ -68,6 +57,19 @@ class Session {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
                 constraints: constraints)
         }
+    }
+
+    func createConstraints(audio: Bool, video: Bool) {
+        return RTCMediaConstraints(
+            mandatoryConstraints: [
+                RTCPair(key: "OfferToReceiveAudio", value: audio),
+                RTCPair(key: "OfferToReceiveVideo", value: video),
+            ],
+            optionalConstraints: [
+                RTCPair(key: "internalSctpDataChannels", value: "true"),
+                RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
+            ]
+        )
     }
     
     func createOrUpdateStream() {
@@ -100,11 +102,18 @@ class Session {
     }
 
     func toggleMute(mute: Bool) {
-        self.config.streams.audio = !mute
         for item in self.stream!.audioTracks {
             let track = item as RTCAudioTrack
             track.setEnabled(!mute)
-        } 
+        }
+        // Update the constraints.
+        self.constraints(false, false)
+    }
+
+    func renegotiate() {
+        self.createOrUpdateStream()
+        self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
+                                                    constraints: constraints)
     }
     
     func receiveMessage(message: String) {

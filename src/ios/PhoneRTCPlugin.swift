@@ -61,12 +61,10 @@ class PhoneRTCPlugin : CDVPlugin {
     func renegotiate(command: CDVInvokedUrlCommand) {
         let args: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = args.objectForKey("sessionKey") as? String {
-            if let config: AnyObject = args.objectForKey("config") {
-                dispatch_async(dispatch_get_main_queue()) {
-                    if let session = self.sessions[sessionKey] {
-                        session.config = SessionConfig(data: config)
-                        session.createOrUpdateStream()
-                    }
+            dispatch_async(dispatch_get_main_queue()) {
+                if let session = self.sessions[sessionKey] {
+                    session.config = SessionConfig(data: config)
+                    session.renegotiate()
                 }
             }
         }
