@@ -43,12 +43,13 @@ class Session {
             URI: NSURL(string: "stun:stun.l.google.com:19302"),
             username: "",
             password: ""))
-        
         iceServers.append(RTCICEServer(
             URI: NSURL(string: self.config.turn.host),
             username: self.config.turn.username,
             password: self.config.turn.password))
-        
+        // Create constraints as per client.
+        constraints = createConstraints(config.streams.audio,
+                                        video: config.streams.video)
         // initialize a PeerConnection
         self.pcObserver = PCObserver(session: self)
         self.peerConnection =
