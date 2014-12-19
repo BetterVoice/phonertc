@@ -35,6 +35,9 @@ In order to install PhoneRTC on iOS, please follow these steps:
            $(inherited) @executable_path/Frameworks
 
 5) Repeat step #4 for the CordovaLib project
+6) Go to `Build Phases`
+7) Drop down `Link Binary With Libraries`
+8) Add libicucore.dylib
 </info>
 
         <config-file target="config.xml" parent="/*">
