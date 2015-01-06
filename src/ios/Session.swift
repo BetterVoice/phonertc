@@ -106,7 +106,7 @@ class Session {
             self.stream!.addVideoTrack(self.plugin.localVideoTrack!)
         }
         
-        self.peerConnection.addStream(self.stream, constraints: self.constraints)
+        self.peerConnection.addStream(self.stream)
     }
 
     func toggleMute(mute: Bool) {
@@ -114,8 +114,6 @@ class Session {
             let track = item as RTCAudioTrack
             track.setEnabled(!mute)
         }
-        // Update the constraints.
-        self.constraints = self.createConstraints(true, video: false)
     }
 
     func renegotiate() {

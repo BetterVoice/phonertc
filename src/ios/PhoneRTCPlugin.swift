@@ -147,7 +147,7 @@ class PhoneRTCPlugin : CDVPlugin {
                     } else {
                         // otherwise, create the local video view
                         self.localVideoView = self.createVideoView(params: params)
-                        self.localVideoView!.videoTrack = self.localVideoTrack!
+                        // self.localVideoView!.videoTrack = self.localVideoTrack!
                     }
                 }
                 
@@ -232,7 +232,7 @@ class PhoneRTCPlugin : CDVPlugin {
         // resized and re-positioned in refreshVideoContainer
         let videoView = createVideoView()
         
-        videoView.videoTrack = videoTrack
+        // videoView.videoTrack = videoTrack
         self.remoteVideoViews.append(videoView)
         
         refreshVideoContainer()
@@ -246,13 +246,13 @@ class PhoneRTCPlugin : CDVPlugin {
         dispatch_async(dispatch_get_main_queue()) {
             for var i = 0; i < self.remoteVideoViews.count; i++ {
                 let videoView = self.remoteVideoViews[i]
-                if videoView.videoTrack == videoTrack {
-                    videoView.hidden = true
-                    videoView.removeFromSuperview()
-                    self.remoteVideoViews.removeAtIndex(i)
-                    self.refreshVideoContainer()
-                    return
-                }
+                // if videoView.videoTrack == videoTrack {
+                //     videoView.hidden = true
+                //     videoView.removeFromSuperview()
+                //     self.remoteVideoViews.removeAtIndex(i)
+                //     self.refreshVideoContainer()
+                //     return
+                // }
             }
         }
     }
