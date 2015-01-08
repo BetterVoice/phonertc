@@ -49,8 +49,6 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                 patched += line + "\r\n"
             }
         }
-        println("\(patched)")
-        println("\(self.getIFAddresses())")
         return sdp
     }
     
