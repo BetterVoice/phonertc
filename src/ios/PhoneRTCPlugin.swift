@@ -4,18 +4,19 @@ import AVFoundation
 @objc(PhoneRTCPlugin)
 class PhoneRTCPlugin : CDVPlugin {
     var peerConnectionFactory: RTCPeerConnectionFactory
-    var sessions: [String: Session] = [:]
+    var sessions: [String: Session]
     
     override init(webView: UIWebView) {
         peerConnectionFactory = RTCPeerConnectionFactory()
         RTCPeerConnectionFactory.initializeSSL()
+        sessions = [:]
         super.init(webView: webView)
     }
     
     func createSession(command: CDVInvokedUrlCommand) {
         if let sessionKey = command.argumentAtIndex(0) as? String {
             // create a session and initialize it.
-            if let args = command.argumentAtIndex(1) {
+            if let args: AnyObject = command.argumentAtIndex(1) {
                 let config = SessionConfig(data: args)
                 let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
                     config: config, callbackId: command.callbackId,
@@ -37,7 +38,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
-        let args: AnyObject AnyObject = command.argumentAtIndex(0)
+        let args: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = args.objectForKey("sessionKey") as? String {
             if let message = args.objectForKey("message") as? String {
                 if let session = self.sessions[sessionKey] {

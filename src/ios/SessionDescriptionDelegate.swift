@@ -41,12 +41,8 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         if peerConnectionError == nil {
             dispatch_async(dispatch_get_main_queue()) {
                 if !self.session.config.isInitiator &&
-                   self.session
-                       .peerConnection
-                       .localDescription == nil {
-                    self.session
-                        .peerConnection
-                        .createAnswerWithDelegate(self, constraints: self.session.constraints)
+                   self.session.peerConnection.localDescription == nil {
+                    self.session.peerConnection.createAnswerWithDelegate(self, constraints: self.session.peerConnectionConstraints)
                 }
             }
         } else {

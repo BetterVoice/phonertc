@@ -9,6 +9,7 @@ class Session {
     var sessionKey: String
     // WebRTC Stuff.
     var peerConnectionFactory: RTCPeerConnectionFactory
+    var peerConnectionConstraints: RTCMediaConstraints
     var peerConnection: RTCPeerConnection!
     var stream: RTCMediaStream
     var track: RTCAudioTrack?
@@ -23,14 +24,6 @@ class Session {
         self.config = config
         self.sessionKey = sessionKey
         self.peerConnectionFactory = peerConnectionFactory
-    }
-    
-    func call() {
-        // Define ICE servers.
-        let url = NSURL(string: "stun:stun.l.google.com:19302")
-        let user = ""
-        let pw = ""
-        var iceServers: [RTCICEServer] = [RTCICEServer(URI: url, username: user, password: pw)]
         // Define the peer connection constraints.
         let mandatory = [
             RTCPair(key: "OfferToReceiveAudio", value: "true"),
@@ -40,11 +33,19 @@ class Session {
             RTCPair(key: "internalSctpDataChannels", value: "true"),
             RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
         ]
-        let constraints = RTCMediaConstraints(mandatoryConstraints: mandatory,
-                                              optionalConstraints: optional)
+        self.peerConnectionConstraints = RTCMediaConstraints(mandatoryConstraints: mandatory,
+                                                             optionalConstraints: optional)
+    }
+    
+    func call() {
+        // Define ICE servers.
+        let url = NSURL(string: "stun:stun.l.google.com:19302")
+        let user = ""
+        let pw = ""
+        let iceServers: = [RTCICEServer(URI: url, username: user, password: pw)]
         // Initialize the peer connection.
         self.peerConnection = peerConnectionFactory.peerConnectionWithICEServers(iceServers,
-                constraints: constraints,
+                constraints: self.peerConnectionConstraints,
                 delegate: PCObserver(session: self))
         // Add the audio track.
         self.stream = peerConnectionFactory.mediaStreamWithLabel("ARDAMS")
@@ -54,12 +55,12 @@ class Session {
         // If we are acting as the caller then generate an offer.
         if self.config.isInitiator {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
-                                                        constraints: constraints)
+                                                        constraints: self.peerConnectionConstraints)
         }
     }
 
     func toggleMute(mute: Bool) {
-        for item in self.stream!.audioTracks {
+        for item in self.stream.audioTracks {
             let track = item as RTCAudioTrack
             track.setEnabled(!mute)
         }
