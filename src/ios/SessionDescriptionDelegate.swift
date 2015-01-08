@@ -7,7 +7,7 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         self.session = session
     }
     
-    func getIFAddresses() -> [String] {
+    func getInterfaceAddresses() -> [String] {
         var addresses = [String]()
         // Get list of all interfaces on the local machine:
         var ifaddr : UnsafeMutablePointer<ifaddrs> = nil
@@ -43,8 +43,6 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                 patched += line.stringByReplacingOccurrencesOfString("0.0.0.0", withString: "IP Address") + "\r\n"
             } else if line.hasPrefix("m=audio") {
                 patched += line.stringByReplacingOccurrencesOfString("RTP/SAVPF", withString: "UDP/TLS/RTP/SAVPF") + "\r\n"
-            } else if line == "a=sendrecv" {
-                // Don't add this attribute it's not necessary.
             } else {
                 patched += line + "\r\n"
             }
