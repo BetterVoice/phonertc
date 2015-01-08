@@ -7,8 +7,8 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         self.session = session
     }
     
-    func getInterfaceAddresses() -> [String] {
-        var addresses = [String]()
+    func getInterfaces() -> [(name: String, address: String)] {
+        var addresses: [(name: String, address: String)] = []
         // Get list of all interfaces on the local machine:
         var ifaddr : UnsafeMutablePointer<ifaddrs> = nil
         if getifaddrs(&ifaddr) == 0 {
@@ -24,9 +24,11 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                         if getnameinfo(&addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count),
                             nil, socklen_t(0), NI_NUMERICHOST) == 0 {
                             if let address = String.fromCString(hostname) {
-                                addresses.append(address)
+                                let name = NSString(UTF8String: ptr.memory.ifa_name)! as String
+                                addresses.append(name: name, address: address)
                             }
                         }
+                        
                     }
                 }
             }
@@ -34,17 +36,31 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         }
         return addresses
     }
-
-    func getPublicInterfaceAddress() -> String {
-        return ""
-    }
-
+    
     func patchSessionDescription(sdp: String) -> String {
         var patched = ""
+        // Select an active network interface device to use.
+        var interface: (name: String, address: String)? = nil
+        let interfaces = self.getInterfaces()
+        // Always try to use the wifi adapter when available and if not fallback to
+        // the first active interface.
+        if interfaces.count > 0 {
+            for item in interfaces {
+                if(item.name == "en0") {
+                    interface = item
+                }
+            }
+            if interface == nil {
+                interface = interfaces[0]
+            }
+        }
+        // Patch the session description.
         let lines = sdp.componentsSeparatedByString("\r\n")
         for line in lines {
             if line.hasPrefix("c=IN IP4") || line.hasPrefix("a=rtcp:") {
-                patched += line.stringByReplacingOccurrencesOfString("0.0.0.0", withString: getPublicInterfaceAddress()) + "\r\n"
+                if interface != nil {
+                    patched += line.stringByReplacingOccurrencesOfString("0.0.0.0", withString: interface!.address) + "\r\n"
+                }
             } else if line.hasPrefix("m=audio") {
                 patched += line.stringByReplacingOccurrencesOfString("RTP/SAVPF", withString: "UDP/TLS/RTP/SAVPF") + "\r\n"
             } else {
@@ -56,45 +72,44 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     
     func peerConnection(peerConnection: RTCPeerConnection!,
         didCreateSessionDescription sdp: RTCSessionDescription!, error: NSError!) {
-        // Set the local session description and dispatch a copy to the js engine.
-        if error == nil {
-            let patchedSessionDescription = patchSessionDescription(sdp.description)
-            
-            self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: sdp)
-            dispatch_async(dispatch_get_main_queue()) {
-                let json: AnyObject = [
-                    "type": sdp.type,
-                    "sdp": sdp.description
-                ]
-                var jsonError: NSError?
-                let data = NSJSONSerialization.dataWithJSONObject(json,
-                    options: NSJSONWritingOptions.allZeros,
-                    error: &jsonError)
-                if let message = data {
-                    self.session.send(data!)
-                } else {
-                    if let serializationError = jsonError {
-                        println("ERROR: \(serializationError.localizedDescription)")
+            // Set the local session description and dispatch a copy to the js engine.
+            if error == nil {
+                let patchedSdp = RTCSessionDescription(type: sdp.type, sdp: self.patchSessionDescription(sdp.description))
+                self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: patchedSdp)
+                dispatch_async(dispatch_get_main_queue()) {
+                    let json: AnyObject = [
+                        "type": patchedSdp.type,
+                        "sdp": patchedSdp.description
+                    ]
+                    var jsonError: NSError?
+                    let data = NSJSONSerialization.dataWithJSONObject(json,
+                        options: NSJSONWritingOptions.allZeros,
+                        error: &jsonError)
+                    if let message = data {
+                        self.session.send(data!)
+                    } else {
+                        if let serializationError = jsonError {
+                            println("ERROR: \(serializationError.localizedDescription)")
+                        }
                     }
                 }
+            } else {
+                println("ERROR: \(error.localizedDescription)")
             }
-        } else {
-            println("ERROR: \(error.localizedDescription)")
-        }
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
         didSetSessionDescriptionWithError error: NSError!) {
-        // If we are acting as the callee then generate an answer to the offer.
-        if error == nil {
-            dispatch_async(dispatch_get_main_queue()) {
-                if !self.session.config.isInitiator &&
-                   self.session.peerConnection.localDescription == nil {
-                    self.session.peerConnection.createAnswerWithDelegate(self, constraints: self.session.peerConnectionConstraints)
+            // If we are acting as the callee then generate an answer to the offer.
+            if error == nil {
+                dispatch_async(dispatch_get_main_queue()) {
+                    if !self.session.config.isInitiator &&
+                        self.session.peerConnection.localDescription == nil {
+                            self.session.peerConnection.createAnswerWithDelegate(self, constraints: self.session.peerConnectionConstraints)
+                    }
                 }
+            } else {
+                println("ERROR: \(error.localizedDescription)")
             }
-        } else {
-            println("ERROR: \(error.localizedDescription)")
-        }
     }
 }
