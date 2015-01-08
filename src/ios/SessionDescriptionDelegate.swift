@@ -35,12 +35,16 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         return addresses
     }
 
+    func getPublicInterfaceAddress() -> String {
+        return ""
+    }
+
     func patchSessionDescription(sdp: String) -> String {
         var patched = ""
         let lines = sdp.componentsSeparatedByString("\r\n")
         for line in lines {
             if line.hasPrefix("c=IN IP4") || line.hasPrefix("a=rtcp:") {
-                patched += line.stringByReplacingOccurrencesOfString("0.0.0.0", withString: "IP Address") + "\r\n"
+                patched += line.stringByReplacingOccurrencesOfString("0.0.0.0", withString: getPublicInterfaceAddress()) + "\r\n"
             } else if line.hasPrefix("m=audio") {
                 patched += line.stringByReplacingOccurrencesOfString("RTP/SAVPF", withString: "UDP/TLS/RTP/SAVPF") + "\r\n"
             } else {
