@@ -8,7 +8,22 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     }
 
     func patchSessionDescription(sdp: String) -> String {
-        return ""
+        var patched = ""
+        let lines = sdp.componentsSeparatedByString("\r\n")
+        for line in lines {
+            if line.hasPrefix("c=IN IP4") {
+                patched += replace(line, original: "0.0.0.0", other: "IP Address") + "\r\n"
+            } else if line.hasPrefix("a=rtcp:") {
+                patched += replace(line, original: "0.0.0.0", other: "IP Address") + "\r\n"
+            } else if line.hasPrefix("m=audio") {
+                patched += replace(line, original: "RTP/SAVPF", other: "UDP/TLS/RTP/SAVPF") + "\r\n"
+            } else if line == "a=sendrecv" {
+                // Don't add this attribute it's not necessary.
+            } else {
+                patched += line + "\r\n"
+            }
+        }
+        return sdp
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
@@ -51,5 +66,9 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         } else {
             println("ERROR: \(error.localizedDescription)")
         }
+    }
+
+    func replace(text: String, original: String, other: String) -> String {
+        return text
     }
 }
