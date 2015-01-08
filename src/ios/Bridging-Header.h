@@ -18,3 +18,5 @@
 #import "RTCEAGLVideoView.h"
 #import "RTCVideoSource.h"
 #import "SRWebSocket.h"
+
+#include <ifaddrs.h>
