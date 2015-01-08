@@ -6,23 +6,51 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     init(session: Session) {
         self.session = session
     }
+    
+    func getIFAddresses() -> [String] {
+        var addresses = [String]()
+        // Get list of all interfaces on the local machine:
+        var ifaddr : UnsafeMutablePointer<ifaddrs> = nil
+        if getifaddrs(&ifaddr) == 0 {
+            // For each interface ...
+            for var ptr = ifaddr; ptr != nil; ptr = ptr.memory.ifa_next {
+                let flags = Int32(ptr.memory.ifa_flags)
+                var addr = ptr.memory.ifa_addr.memory
+                // Check for running IPv4, IPv6 interfaces. Skip the loopback interface.
+                if (flags & (IFF_UP|IFF_RUNNING|IFF_LOOPBACK)) == (IFF_UP|IFF_RUNNING) {
+                    if addr.sa_family == UInt8(AF_INET) || addr.sa_family == UInt8(AF_INET6) {
+                        // Convert interface address to a human readable string:
+                        var hostname = [CChar](count: Int(NI_MAXHOST), repeatedValue: 0)
+                        if getnameinfo(&addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count),
+                            nil, socklen_t(0), NI_NUMERICHOST) == 0 {
+                            if let address = String.fromCString(hostname) {
+                                addresses.append(address)
+                            }
+                        }
+                    }
+                }
+            }
+            freeifaddrs(ifaddr)
+        }
+        return addresses
+    }
 
     func patchSessionDescription(sdp: String) -> String {
         var patched = ""
         let lines = sdp.componentsSeparatedByString("\r\n")
         for line in lines {
-            if line.hasPrefix("c=IN IP4") {
-                patched += replace(line, original: "0.0.0.0", other: "IP Address") + "\r\n"
-            } else if line.hasPrefix("a=rtcp:") {
-                patched += replace(line, original: "0.0.0.0", other: "IP Address") + "\r\n"
+            if line.hasPrefix("c=IN IP4") || line.hasPrefix("a=rtcp:") {
+                patched += line.stringByReplacingOccurrencesOfString("0.0.0.0", withString: "IP Address") + "\r\n"
             } else if line.hasPrefix("m=audio") {
-                patched += replace(line, original: "RTP/SAVPF", other: "UDP/TLS/RTP/SAVPF") + "\r\n"
+                patched += line.stringByReplacingOccurrencesOfString("RTP/SAVPF", withString: "UDP/TLS/RTP/SAVPF") + "\r\n"
             } else if line == "a=sendrecv" {
                 // Don't add this attribute it's not necessary.
             } else {
                 patched += line + "\r\n"
             }
         }
+        println("\(patched)")
+        println("\(self.getIFAddresses())")
         return sdp
     }
     
@@ -30,6 +58,8 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         didCreateSessionDescription sdp: RTCSessionDescription!, error: NSError!) {
         // Set the local session description and dispatch a copy to the js engine.
         if error == nil {
+            let patchedSessionDescription = patchSessionDescription(sdp.description)
+            
             self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: sdp)
             dispatch_async(dispatch_get_main_queue()) {
                 let json: AnyObject = [
@@ -66,9 +96,5 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         } else {
             println("ERROR: \(error.localizedDescription)")
         }
-    }
-
-    func replace(text: String, original: String, other: String) -> String {
-        return text
     }
 }
