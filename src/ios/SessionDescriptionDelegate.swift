@@ -6,6 +6,10 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     init(session: Session) {
         self.session = session
     }
+
+    func patchSessionDescription(sdp: String) -> String {
+        return ""
+    }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
         didCreateSessionDescription sdp: RTCSessionDescription!, error: NSError!) {
