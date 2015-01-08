@@ -10,13 +10,6 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
     func peerConnection(peerConnection: RTCPeerConnection!,
         addedStream stream: RTCMediaStream!) {
         println("PCO onAddStream.")
-            
-        dispatch_async(dispatch_get_main_queue()) {
-            if stream.videoTracks.count > 0 {
-                self.session.addVideoTrack(stream.videoTracks[0] as RTCVideoTrack)
-            }
-        }
-        
         self.session.sendMessage(
             "{\"type\": \"__answered\"}".dataUsingEncoding(NSUTF8StringEncoding)!)
     }
@@ -24,12 +17,6 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
     func peerConnection(peerConnection: RTCPeerConnection!,
         removedStream stream: RTCMediaStream!) {
         println("PCO onRemoveStream.")
-        /*
-        dispatch_async(dispatch_get_main_queue()) {
-            if stream.videoTracks.count > 0 {
-                self.session.removeVideoTrack(stream.videoTracks[0] as RTCVideoTrack)
-            }
-        }*/
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
