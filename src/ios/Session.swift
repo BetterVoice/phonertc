@@ -10,6 +10,7 @@ class Session {
     // WebRTC Stuff.
     var peerConnectionFactory: RTCPeerConnectionFactory
     var peerConnectionConstraints: RTCMediaConstraints
+    var peerConnectionObserver: RTCPeerConnectionDelegate?
     var peerConnection: RTCPeerConnection!
     var stream: RTCMediaStream?
     var track: RTCAudioTrack?
@@ -46,14 +47,15 @@ class Session {
     
     func initialize() {
         // Define ICE servers.
-        let url = NSURL(string: "stun:stun.l.google.com:19302")
-        let user = ""
-        let pw = ""
+        let url = NSURL(string: "turn:54.94.234.154")
+        let user = "bettervoice"
+        let pw = "nopassword"
         let iceServers = [RTCICEServer(URI: url, username: user, password: pw)]
         // Initialize the peer connection.
+        self.peerConnectionObserver = PCObserver(session: self)
         self.peerConnection = peerConnectionFactory.peerConnectionWithICEServers(iceServers,
                 constraints: self.peerConnectionConstraints,
-                delegate: PCObserver(session: self))
+                delegate: self.peerConnectionObserver)
         // Add the audio track.
         self.stream = peerConnectionFactory.mediaStreamWithLabel("ARDAMS")
         self.track = peerConnectionFactory.audioTrackWithID("ARDAMSa0")

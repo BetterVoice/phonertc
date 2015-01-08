@@ -74,12 +74,11 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
         didCreateSessionDescription sdp: RTCSessionDescription!, error: NSError!) {
             // Set the local session description and dispatch a copy to the js engine.
             if error == nil {
-                let patchedSdp = RTCSessionDescription(type: sdp.type, sdp: self.patchSessionDescription(sdp.description))
-                self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: patchedSdp)
+                self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: sdp)
                 dispatch_async(dispatch_get_main_queue()) {
                     let json: AnyObject = [
-                        "type": patchedSdp.type,
-                        "sdp": patchedSdp.description
+                        "type": sdp.type,
+                        "sdp": self.patchSessionDescription(sdp.description)
                     ]
                     var jsonError: NSError?
                     let data = NSJSONSerialization.dataWithJSONObject(json,
