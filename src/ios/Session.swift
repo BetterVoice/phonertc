@@ -115,22 +115,6 @@ class Session {
             track.setEnabled(!mute)
         }
     }
-
-    func renegotiate() {
-        // Cleanup the old peer connection.
-        if self.stream != nil {
-            self.peerConnection.removeStream(self.stream)
-            self.stream = nil
-        }
-        self.peerConnection.close()
-        self.peerConnection = nil
-        // Create a new peer connection and generate a session description.
-        self.peerConnection = peerConnectionFactory.peerConnectionWithICEServers(iceServers,
-            constraints: self.constraints, delegate: self.pcObserver)
-        self.createOrUpdateStream()
-        self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
-                                                    constraints: constraints)
-    }
     
     func receiveMessage(message: String) {
         // Parse the incoming JSON message.

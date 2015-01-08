@@ -57,17 +57,6 @@ class PhoneRTCPlugin : CDVPlugin {
             }
         }
     }
-    
-    func renegotiate(command: CDVInvokedUrlCommand) {
-        let args: AnyObject = command.argumentAtIndex(0)
-        if let sessionKey = args.objectForKey("sessionKey") as? String {
-            dispatch_async(dispatch_get_main_queue()) {
-                if let session = self.sessions[sessionKey] {
-                    session.renegotiate()
-                }
-            }
-        }
-    }
 
     func toggleMute(command: CDVInvokedUrlCommand) {
         let args: AnyObject = command.argumentAtIndex(0);
