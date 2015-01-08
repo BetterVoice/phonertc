@@ -58,7 +58,7 @@ class PhoneRTCPlugin : CDVPlugin {
             if let message = args.objectForKey("message") as? String {
                 if let session = self.sessions[sessionKey] {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                        session.receiveMessage(message)
+                        session.receive(message)
                     }
                 }
             }
