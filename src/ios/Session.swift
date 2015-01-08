@@ -10,7 +10,6 @@ class Session {
     var peerConnectionFactory: RTCPeerConnectionFactory
     var callbackId: String
     var stream: RTCMediaStream?
-    var videoTrack: RTCVideoTrack?
     var sessionKey: String
     
     init(plugin: PhoneRTCPlugin,
@@ -48,8 +47,7 @@ class Session {
             username: self.config.turn.username,
             password: self.config.turn.password))
         // Create constraints as per client.
-        constraints = createConstraints(config.streams.audio,
-                                        video: config.streams.video)
+        constraints = self.constraints
         // initialize a PeerConnection
         self.pcObserver = PCObserver(session: self)
         self.peerConnection =
@@ -65,19 +63,6 @@ class Session {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
                 constraints: constraints)
         }
-    }
-
-    func createConstraints(audio: Bool, video: Bool) -> RTCMediaConstraints {
-        let mandatory = [
-            RTCPair(key: "OfferToReceiveAudio", value: audio ? "true" : "false"),
-            RTCPair(key: "OfferToReceiveVideo", value: video ? "true" : "false")
-        ]
-        let optional = [
-            RTCPair(key: "internalSctpDataChannels", value: "true"),
-            RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
-        ]
-        return RTCMediaConstraints(mandatoryConstraints: mandatory,
-                                   optionalConstraints: optional)
     }
     
     func createOrUpdateStream() {
@@ -185,15 +170,6 @@ class Session {
         self.sendMessage(data!)
         
         self.plugin.onSessionDisconnect(self.sessionKey)
-    }
-    
-    func addVideoTrack(videoTrack: RTCVideoTrack) {
-        self.videoTrack = videoTrack
-        self.plugin.addRemoteVideoTrack(videoTrack)
-    }
-    
-    func removeVideoTrack(videoTrack: RTCVideoTrack) {
-        self.plugin.removeRemoteVideoTrack(videoTrack)
     }
     
     func preferISAC(sdpDescription: String) -> String {

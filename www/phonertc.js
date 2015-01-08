@@ -1,5 +1,4 @@
 var exec = require('cordova/exec');
-var videoViewConfig;
 
 function createUUID() {
   // http://www.ietf.org/rfc/rfc4122.txt
@@ -16,8 +15,7 @@ function createUUID() {
   return uuid;
 }
 
-function Session(config) { 
-  // make sure that the config object is valid
+function Session(config) {
   if (typeof config !== 'object') {
     throw {
       name: 'PhoneRTC Error',
@@ -158,54 +156,3 @@ Session.prototype.close = function () {
 };
 
 exports.Session = Session;
-
-function getLayoutParams(videoElement) {
-  var boundingRect = videoElement.getBoundingClientRect();
-
-  if (cordova.platformId === 'android') {
-    return {
-      position: [boundingRect.left + window.scrollX, boundingRect.top + window.scrollY],
-      size: [videoElement.offsetWidth, videoElement.offsetHeight]
-    };
-  }
-
-  return {
-    position: [boundingRect.left, boundingRect.top],
-    size: [videoElement.offsetWidth, videoElement.offsetHeight]
-  };
-}
-
-function setVideoView(config) {
-  videoViewConfig = config;
-
-  var container = config.container;
-
-  if (container) {
-    config.containerParams = getLayoutParams(container);
-    delete config.container;
-  }
-
-  config.devicePixelRatio = window.devicePixelRatio || 2;
-
-  exec(null, null, 'PhoneRTCPlugin', 'setVideoView', [config]);
-
-  if (container) {
-    config.container = container;
-  }
-};
-
-document.addEventListener('touchmove', function () {
-  if (videoViewConfig) {
-    setVideoView(videoViewConfig);
-  }
-});
-
-exports.setVideoView = setVideoView;
-
-exports.hideVideoView = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'hideVideoView', []);
-};
-
-exports.showVideoView = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'showVideoView', []);
-};
