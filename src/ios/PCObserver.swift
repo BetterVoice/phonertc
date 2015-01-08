@@ -9,7 +9,7 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
     
     func peerConnection(peerConnection: RTCPeerConnection!,
                         addedStream stream: RTCMediaStream!) {
-        self.session.sendMessage("{\"type\": \"__answered\"}".dataUsingEncoding(NSUTF8StringEncoding)!)
+        // Nothing to do.
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,

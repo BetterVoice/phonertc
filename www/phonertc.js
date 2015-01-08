@@ -57,16 +57,10 @@ function Session(config) {
   }
 
   function onSendMessage(data) {
-    if (data.type === '__answered') {
-      callEvent('answer');
-    } else if (data.type === '__disconnected') {
-      callEvent('disconnect');
-    } else {
-      callEvent('sendMessage', data);
-    }
+    callEvent('sendMessage', data);
   }
 
-  exec(onSendMessage, null, 'PhoneRTCPlugin', 'createSessionObject', [self.sessionKey, config]);
+  exec(onSendMessage, null, 'PhoneRTCPlugin', 'createSession', [self.sessionKey, config]);
 };
 
 Session.prototype.on = function (eventName, fn) {

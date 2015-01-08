@@ -3,9 +3,8 @@ import AVFoundation
 
 @objc(PhoneRTCPlugin)
 class PhoneRTCPlugin : CDVPlugin {
-    var sessions: [String: Session] = [:]
     var peerConnectionFactory: RTCPeerConnectionFactory
-    var localAudioTrack: RTCAudioTrack?
+    var sessions: [String: Session] = [:]
     
     override init(webView: UIWebView) {
         peerConnectionFactory = RTCPeerConnectionFactory()
@@ -13,7 +12,7 @@ class PhoneRTCPlugin : CDVPlugin {
         super.init(webView: webView)
     }
     
-    func createSessionObject(command: CDVInvokedUrlCommand) {
+    func createSession(command: CDVInvokedUrlCommand) {
         if let sessionKey = command.argumentAtIndex(0) as? String {
             // create a session and initialize it.
             if let args = command.argumentAtIndex(1) {
@@ -68,7 +67,7 @@ class PhoneRTCPlugin : CDVPlugin {
         if let sessionKey = args.objectForKey("sessionKey") as? String {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 if (self.sessions[sessionKey] != nil) {
-                    self.sessions[sessionKey]!.disconnect(true)
+                    self.sessions[sessionKey]!.disconnect()
                 }
             }
         }
@@ -78,21 +77,12 @@ class PhoneRTCPlugin : CDVPlugin {
         let json = NSJSONSerialization.JSONObjectWithData(message,
             options: NSJSONReadingOptions.MutableLeaves,
             error: nil) as NSDictionary
-        
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
         pluginResult.setKeepCallbackAsBool(true);
-        
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId:callbackId)
+        self.commandDelegate.sendPluginResult(pluginResult, callbackId: callbackId)
     }
     
-    func initLocalAudioTrack() {
-        localAudioTrack = peerConnectionFactory.audioTrackWithID("ARDAMSa0")
-    }
-    
-    func onSessionDisconnect(sessionKey: String) {
+    func destroySession(sessionKey: String) {
         self.sessions.removeValueForKey(sessionKey)
-        if self.sessions.count == 0 {
-            self.localAudioTrack = nil
-        }
     }
 }
