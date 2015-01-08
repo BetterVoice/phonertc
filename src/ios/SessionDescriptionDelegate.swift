@@ -8,65 +8,49 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
-        didCreateSessionDescription originalSdp: RTCSessionDescription!, error: NSError!) {
-        if error != nil {
-            println("SDP OnFailure: \(error)")
-            return
-        }
-            
-        var sdp = RTCSessionDescription(
-            type: originalSdp.type,
-            sdp: self.session.preferISAC(originalSdp.description)
-        )
-        
-        self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: sdp)
-            
-        dispatch_async(dispatch_get_main_queue()) {
-            var jsonError: NSError?
-            
-            let json: AnyObject = [
-                "type": sdp.type,
-                "sdp": sdp.description
-            ]
-            
-            let data = NSJSONSerialization.dataWithJSONObject(json,
-                options: NSJSONWritingOptions.allZeros,
-                error: &jsonError)
-            
-            self.session.sendMessage(data!)
+                        didCreateSessionDescription sdp: RTCSessionDescription!,
+                        peerConnectionError: NSError!) {
+        // Set the local session description and dispatch a copy to the js engine.
+        if peerConnectionError == nil {
+            self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: sdp)
+            dispatch_async(dispatch_get_main_queue()) {
+                let json: AnyObject = [
+                    "type": sdp.type,
+                    "sdp": sdp.description
+                ]
+                var error: NSError?
+                let data = NSJSONSerialization.dataWithJSONObject(json,
+                    options: NSJSONWritingOptions.allZeros,
+                    error: &error)
+                if let message = data {
+                    self.session.sendMessage(data!)
+                } else {
+                    if let jsonError = error {
+                        println("ERROR: \(jsonError.localizedDescription)")
+                    }
+                }
+            }
+        } else {
+            println("ERROR: \(peerConnectionError.localizedDescription)")
         }
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
-        didSetSessionDescriptionWithError error: NSError!) {
-        if error != nil {
-            println("SDP OnFailure: \(error)")
-            return
-        }
-            
-        dispatch_async(dispatch_get_main_queue()) {
-            if self.session.config.isInitiator {
-                if self.session.peerConnection.remoteDescription != nil {
-                    println("SDP onSuccess - drain candidates")
-                    self.drainRemoteCandidates()
-                }
-            } else {
-                if self.session.peerConnection.localDescription != nil {
-                    self.drainRemoteCandidates()
-                } else {
-                    self.session.peerConnection.createAnswerWithDelegate(self,
-                        constraints: self.session.constraints)
+        didSetSessionDescriptionWithError peerConnectionError: NSError!) {
+        // If we are acting as the callee then generate an answer to the offer.
+        if peerConnectionError == nil {
+            dispatch_async(dispatch_get_main_queue()) {
+                if !self.session.config.isInitiator &&
+                   self.session
+                       .peerConnection
+                       .localDescription == nil {
+                    self.session
+                        .peerConnection
+                        .createAnswerWithDelegate(self, constraints: self.session.constraints)
                 }
             }
-        }
-    }
-    
-    func drainRemoteCandidates() {
-        if let queuedRemoteCandidates = self.session.queuedRemoteCandidates {
-            for candidate in queuedRemoteCandidates {
-                self.session.peerConnection.addICECandidate(candidate)
-            }
-            self.session.queuedRemoteCandidates = nil
+        } else {
+            println("ERROR: \(peerConnectionError.localizedDescription)")
         }
     }
 }

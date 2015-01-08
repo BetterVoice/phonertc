@@ -38,7 +38,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
-        let args: AnyObject = command.argumentAtIndex(0)
+        let args: AnyObject AnyObject = command.argumentAtIndex(0)
         if let sessionKey = args.objectForKey("sessionKey") as? String {
             if let message = args.objectForKey("message") as? String {
                 if let session = self.sessions[sessionKey] {
@@ -93,7 +93,6 @@ class PhoneRTCPlugin : CDVPlugin {
         self.sessions.removeValueForKey(sessionKey)
         if self.sessions.count == 0 {
             self.localAudioTrack = nil
-            self.videoCapturer = nil
         }
     }
 }

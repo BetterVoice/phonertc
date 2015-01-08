@@ -6,7 +6,6 @@ class Session {
     var constraints: RTCMediaConstraints
     var peerConnection: RTCPeerConnection!
     var pcObserver: PCObserver!
-    var queuedRemoteCandidates: [RTCICECandidate]?
     var peerConnectionFactory: RTCPeerConnectionFactory
     var callbackId: String
     var stream: RTCMediaStream?
@@ -18,7 +17,6 @@ class Session {
          callbackId: String,
          sessionKey: String) {
         self.plugin = plugin
-        self.queuedRemoteCandidates = []
         self.config = config
         self.peerConnectionFactory = peerConnectionFactory
         self.callbackId = callbackId
@@ -46,8 +44,6 @@ class Session {
             URI: NSURL(string: self.config.turn.host),
             username: self.config.turn.username,
             password: self.config.turn.password))
-        // Create constraints as per client.
-        constraints = self.constraints
         // initialize a PeerConnection
         self.pcObserver = PCObserver(session: self)
         self.peerConnection =
@@ -107,7 +103,7 @@ class Session {
                 switch type {
                     case "offer", "answer":
                         if let sdpString = object.objectForKey("sdp") as? String {
-                            let sdp = RTCSessionDescription(type: type, sdp: self.preferISAC(sdpString))
+                            let sdp = RTCSessionDescription(type: type, sdp: sdpString)
                             self.peerConnection.setRemoteDescriptionWithDelegate(SessionDescriptionDelegate(session: self),
                                                                                  sessionDescription: sdp)
                         }
@@ -143,7 +139,6 @@ class Session {
         
             self.peerConnection.close()
             self.peerConnection = nil
-            self.queuedRemoteCandidates = nil
         }
         
         let json: AnyObject = [
@@ -157,74 +152,6 @@ class Session {
         self.sendMessage(data!)
         
         self.plugin.onSessionDisconnect(self.sessionKey)
-    }
-    
-    func preferISAC(sdpDescription: String) -> String {
-        var mLineIndex = -1
-        var isac16kRtpMap: String?
-        
-        let origSDP = sdpDescription.stringByReplacingOccurrencesOfString("\r\n", withString: "\n")
-        var lines = origSDP.componentsSeparatedByString("\n")
-        let isac16kRegex = NSRegularExpression(
-            pattern: "^a=rtpmap:(\\d+) ISAC/16000[\r]?$",
-            options: NSRegularExpressionOptions.allZeros,
-            error: nil)
-        
-        for var i = 0;
-            (i < lines.count) && (mLineIndex == -1 || isac16kRtpMap == nil);
-            ++i {
-            let line = lines[i]
-            if line.hasPrefix("m=audio ") {
-                mLineIndex = i
-                continue
-            }
-                
-            isac16kRtpMap = self.firstMatch(isac16kRegex!, string: line)
-        }
-        
-        if mLineIndex == -1 {
-            println("No m=audio line, so can't prefer iSAC")
-            return origSDP
-        }
-        
-        if isac16kRtpMap == nil {
-            println("No ISAC/16000 line, so can't prefer iSAC")
-            return origSDP
-        }
-        
-        let origMLineParts = lines[mLineIndex].componentsSeparatedByString(" ")
-
-        var newMLine: [String] = []
-        var origPartIndex = 0;
-        
-        // Format is: m=<media> <port> <proto> <fmt> ...
-        newMLine.append(origMLineParts[origPartIndex++])
-        newMLine.append(origMLineParts[origPartIndex++])
-        newMLine.append(origMLineParts[origPartIndex++])
-        newMLine.append(isac16kRtpMap!)
-        
-        for ; origPartIndex < origMLineParts.count; ++origPartIndex {
-            if isac16kRtpMap != origMLineParts[origPartIndex] {
-                newMLine.append(origMLineParts[origPartIndex])
-            }
-        }
-        
-        lines[mLineIndex] = " ".join(newMLine)
-        return "\r\n".join(lines)
-    }
-    
-    func firstMatch(pattern: NSRegularExpression, string: String) -> String? {
-        var nsString = string as NSString
-        
-        let result = pattern.firstMatchInString(string,
-            options: NSMatchingOptions.allZeros,
-            range: NSMakeRange(0, nsString.length))
-        
-        if result == nil {
-            return nil
-        }
-        
-        return nsString.substringWithRange(result!.rangeAtIndex(1))
     }
     
     func sendMessage(message: NSData) {
