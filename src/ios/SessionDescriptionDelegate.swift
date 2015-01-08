@@ -67,7 +67,7 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                 patched += line + "\r\n"
             }
         }
-        return sdp
+        return patched
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
