@@ -11,7 +11,7 @@ class Session {
     var peerConnectionFactory: RTCPeerConnectionFactory
     var peerConnectionConstraints: RTCMediaConstraints
     var peerConnection: RTCPeerConnection!
-    var stream: RTCMediaStream
+    var stream: RTCMediaStream?
     var track: RTCAudioTrack?
     
     init(plugin: PhoneRTCPlugin,
@@ -42,7 +42,7 @@ class Session {
         let url = NSURL(string: "stun:stun.l.google.com:19302")
         let user = ""
         let pw = ""
-        let iceServers: = [RTCICEServer(URI: url, username: user, password: pw)]
+        let iceServers = [RTCICEServer(URI: url, username: user, password: pw)]
         // Initialize the peer connection.
         self.peerConnection = peerConnectionFactory.peerConnectionWithICEServers(iceServers,
                 constraints: self.peerConnectionConstraints,
@@ -60,7 +60,7 @@ class Session {
     }
 
     func toggleMute(mute: Bool) {
-        for item in self.stream.audioTracks {
+        for item in self.stream!.audioTracks {
             let track = item as RTCAudioTrack
             track.setEnabled(!mute)
         }

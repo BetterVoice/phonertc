@@ -8,37 +8,36 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
-                        didCreateSessionDescription sdp: RTCSessionDescription!,
-                        peerConnectionError: NSError!) {
+        didCreateSessionDescription sdp: RTCSessionDescription!, error: NSError!) {
         // Set the local session description and dispatch a copy to the js engine.
-        if peerConnectionError == nil {
+        if error == nil {
             self.session.peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: sdp)
             dispatch_async(dispatch_get_main_queue()) {
                 let json: AnyObject = [
                     "type": sdp.type,
                     "sdp": sdp.description
                 ]
-                var error: NSError?
+                var jsonError: NSError?
                 let data = NSJSONSerialization.dataWithJSONObject(json,
                     options: NSJSONWritingOptions.allZeros,
-                    error: &error)
+                    error: &jsonError)
                 if let message = data {
                     self.session.sendMessage(data!)
                 } else {
-                    if let jsonError = error {
-                        println("ERROR: \(jsonError.localizedDescription)")
+                    if let serializationError = jsonError {
+                        println("ERROR: \(serializationError.localizedDescription)")
                     }
                 }
             }
         } else {
-            println("ERROR: \(peerConnectionError.localizedDescription)")
+            println("ERROR: \(error.localizedDescription)")
         }
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,
-        didSetSessionDescriptionWithError peerConnectionError: NSError!) {
+        didSetSessionDescriptionWithError error: NSError!) {
         // If we are acting as the callee then generate an answer to the offer.
-        if peerConnectionError == nil {
+        if error == nil {
             dispatch_async(dispatch_get_main_queue()) {
                 if !self.session.config.isInitiator &&
                    self.session.peerConnection.localDescription == nil {
@@ -46,7 +45,7 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                 }
             }
         } else {
-            println("ERROR: \(peerConnectionError.localizedDescription)")
+            println("ERROR: \(error.localizedDescription)")
         }
     }
 }
