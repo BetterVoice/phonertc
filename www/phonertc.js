@@ -23,12 +23,10 @@ function Session(config) {
     };
   }
 
-  if (typeof config.isInitiator === 'undefined' ||
-      typeof config.turn === 'undefined' ||
-      typeof config.streams === 'undefined') {
+  if (typeof config.isInitiator === 'undefined') {
     throw {
       name: 'PhoneRTC Error',
-      message: 'isInitiator, turn and streams are required parameters.'
+      message: 'isInitiator is a required parameter.'
     };
   }
 
