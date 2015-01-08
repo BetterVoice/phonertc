@@ -82,15 +82,6 @@ class Session {
             self.stream!.addAudioTrack(self.plugin.localAudioTrack!)
         }
         
-        if self.config.streams.video {
-            // init local video track if needed
-            if self.plugin.localVideoTrack == nil {
-                self.plugin.initLocalVideoTrack()
-            }
-            
-            self.stream!.addVideoTrack(self.plugin.localVideoTrack!)
-        }
-        
         self.peerConnection.addStream(self.stream)
     }
 
@@ -137,10 +128,6 @@ class Session {
     }
 
     func disconnect(sendByeMessage: Bool) {
-        if self.videoTrack != nil {
-            self.removeVideoTrack(self.videoTrack!)
-        }
-        
         if self.peerConnection != nil {
             if sendByeMessage {
                 let json: AnyObject = [

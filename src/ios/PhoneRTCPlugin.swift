@@ -91,21 +91,8 @@ class PhoneRTCPlugin : CDVPlugin {
     
     func onSessionDisconnect(sessionKey: String) {
         self.sessions.removeValueForKey(sessionKey)
-        
         if self.sessions.count == 0 {
-            dispatch_sync(dispatch_get_main_queue()) {
-                if self.localVideoView != nil {
-                    self.localVideoView!.hidden = true
-                    self.localVideoView!.removeFromSuperview()
-                
-                    self.localVideoView = nil
-                }
-            }
-            
-            self.localVideoTrack = nil
             self.localAudioTrack = nil
-            
-            self.videoSource = nil
             self.videoCapturer = nil
         }
     }
