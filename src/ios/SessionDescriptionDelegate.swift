@@ -22,7 +22,7 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                     options: NSJSONWritingOptions.allZeros,
                     error: &jsonError)
                 if let message = data {
-                    self.session.sendMessage(data!)
+                    self.session.send(data!)
                 } else {
                     if let serializationError = jsonError {
                         println("ERROR: \(serializationError.localizedDescription)")

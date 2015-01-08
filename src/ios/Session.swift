@@ -36,8 +36,15 @@ class Session {
         self.peerConnectionConstraints = RTCMediaConstraints(mandatoryConstraints: mandatory,
                                                              optionalConstraints: optional)
     }
+
+    func disconnect() {
+        if self.peerConnection != nil {
+            self.peerConnection.close()
+        }
+        self.plugin.destroySession(self.sessionKey)
+    }
     
-    func call() {
+    func initialize() {
         // Define ICE servers.
         let url = NSURL(string: "stun:stun.l.google.com:19302")
         let user = ""
@@ -58,15 +65,8 @@ class Session {
                                                         constraints: self.peerConnectionConstraints)
         }
     }
-
-    func toggleMute(mute: Bool) {
-        for item in self.stream!.audioTracks {
-            let track = item as RTCAudioTrack
-            track.setEnabled(!mute)
-        }
-    }
     
-    func receiveMessage(message: String) {
+    func receive(message: String) {
         // Parse the incoming message.
         var error : NSError?
         let data : AnyObject? = NSJSONSerialization.JSONObjectWithData(
@@ -95,15 +95,15 @@ class Session {
             return
         }
     }
-
-    func disconnect() {
-        if self.peerConnection != nil {
-            self.peerConnection.close()
-        }
-        self.plugin.destroySession(self.sessionKey)
-    }
     
-    func sendMessage(message: NSData) {
-        self.plugin.sendMessage(self.callbackId, message: message)
+    func send(message: NSData) {
+        self.plugin.send(self.callbackId, message: message)
+    }
+
+    func toggleMute(mute: Bool) {
+        for item in self.stream!.audioTracks {
+            let track = item as RTCAudioTrack
+            track.setEnabled(!mute)
+        }
     }
 }

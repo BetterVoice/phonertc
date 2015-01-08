@@ -43,7 +43,7 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
         )
         // Try to dispatch the serialized event to the js engine.
         if let message = data {
-            self.session.sendMessage(message)
+            self.session.send(message)
         } else {
             if let jsonError = error {
                 println("ERROR: \(jsonError.localizedDescription)")

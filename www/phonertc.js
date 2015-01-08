@@ -116,16 +116,15 @@ Session.prototype.off = function (eventName, fn) {
   })
 };
 
-Session.prototype.call = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'call', [{
+Session.prototype.close = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
     sessionKey: this.sessionKey
   }]);
 };
 
-Session.prototype.receiveMessage = function (data) {
-  exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
-    sessionKey: this.sessionKey,
-    message: JSON.stringify(data)
+Session.prototype.initialize = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'initialize', [{
+    sessionKey: this.sessionKey
   }]);
 };
 
@@ -136,16 +135,17 @@ Session.prototype.mute = function () {
   }]);
 };
 
+Session.prototype.receive = function (data) {
+  exec(null, null, 'PhoneRTCPlugin', 'receive', [{
+    sessionKey: this.sessionKey,
+    message: JSON.stringify(data)
+  }]);
+};
+
 Session.prototype.unmute = function () {
   exec(null, null, 'PhoneRTCPlugin', 'toggleMute', [{
     sessionKey: this.sessionKey,
     mute: false
-  }]);
-};
-
-Session.prototype.close = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
-    sessionKey: this.sessionKey
   }]);
 };
 
