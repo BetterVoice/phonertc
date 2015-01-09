@@ -7,22 +7,40 @@ class WebSocket {
     // State Stuff
     var sessionKey: String
     // Web Socket Stuff.
-    var socket: SRSocket
+    var socket: SRWebSocket?
+    var socketDelegate: WebSocketDelegate
     var url: NSURL
-    var protocols: [String]
+    var protocols: [String]?
     
-    init(plugin: PhoneRTCPlugin,
-         sessionKey: String,
-         url: String,
-         protocols: [String]) {
-        self.url = NSURL(url)
+    init(url: String,
+         protocols: [String]?,
+         plugin: PhoneRTCPlugin,
+         callbackId: String,
+         sessionKey: String
+        ) {
+        self.url = NSURL(string: url)!
         self.protocols = protocols
         self.plugin = plugin
         self.callbackId = callbackId
         self.sessionKey = sessionKey
+        let request = NSMutableURLRequest(URL: self.url)
+        request.networkServiceType = NSURLRequestNetworkServiceType.NetworkServiceTypeVoIP
+        if(self.protocols == nil) {
+            self.socket = SRWebSocket(URLRequest: request)
+        } else {
+            self.socket = SRWebSocket(URLRequest: request, protocols: protocols)
+        }
+        self.socketDelegate = WebSocketDelegate(plugin: plugin, callbackId: callbackId)
+        self.socket!.delegate = self.socketDelegate
+        self.socket!.open()
     }
-
-    func open() {
-
+    
+    func close() {
+        self.socket!.close()
+        self.plugin.destroyWebSocket(self.sessionKey)
+    }
+    
+    func send(data: AnyObject) {
+        self.socket!.send(data)
     }
 }

@@ -5,7 +5,7 @@ import AVFoundation
 class PhoneRTCPlugin : CDVPlugin {
     var peerConnectionFactory: RTCPeerConnectionFactory
     var sessions: [String: Session]
-    var sockets: [String: SRWebSocket]
+    var sockets: [String: WebSocket]
     
     override init(webView: UIWebView) {
         peerConnectionFactory = RTCPeerConnectionFactory()
