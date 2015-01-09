@@ -1,6 +1,6 @@
 import Foundation
 
-class Session {
+class WebSocketDelegate {
     init() {
         // Nothing to do for now.
     }

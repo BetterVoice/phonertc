@@ -1,6 +1,6 @@
 import Foundation
 
-class Session {
+class WebSocket {
     // Cordova Stuff
     var plugin: PhoneRTCPlugin
     var callbackId: String
@@ -23,6 +23,6 @@ class Session {
     }
 
     func open() {
-        
+
     }
 }
