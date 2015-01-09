@@ -31,22 +31,28 @@ class PhoneRTCPlugin : CDVPlugin {
     }
 
     func createWebSocket(command: CDVInvokedUrlCommand) {
-        if let sessionKey = command.argumentAtIndex(0) as? String {
-            if let args: AnyObject = command.argumentAtIndex(1) {
-                if let url = args.objectForKey("url") as? String {
-                    let protocols = args.objectForKey("protocols") as? [String]
-                    let socket = WebSocket(url: url, protocols: protocols,
-                        plugin: self, callbackId: command.callbackId, 
-                        sessionKey: sessionKey)
-                    socket.open();
-                    sockets[sessionKey] = socket
-                }
-            }
+        let url = command.argumentAtIndex(0) as? String
+        let protocols = command.argumentAtIndex(1) as? [String]
+        let key = command.argumentAtIndex(3) as? String
+        if url != nil && key != nil {
+            let socket = WebSocket(url: url!, protocols: protocols,
+                plugin: self, callbackId: command.callbackId,
+                sessionKey: key!)
+            sockets[key!] = socket
         }
     }
 
     func destroyWebSocket(sessionKey: String) {
         self.sockets.removeValueForKey(sessionKey)
+    }
+    
+    func close(command: CDVInvokedUrlCommand) {
+        let code = command.argumentAtIndex(0) as? Int
+        let reason = command.argumentAtIndex(1) as? String
+        let key = command.argumentAtIndex(3) as? String
+        if key != nil {
+            self.sockets[key!]!.close(code, reason: reason)
+        }
     }
 
     func disconnect(command: CDVInvokedUrlCommand) {
@@ -58,6 +64,15 @@ class PhoneRTCPlugin : CDVPlugin {
                 }
             }
         }
+    }
+    
+    func dispatch(callbackId: String, message: NSData) {
+        let json = NSJSONSerialization.JSONObjectWithData(message,
+            options: NSJSONReadingOptions.MutableLeaves,
+            error: nil) as NSDictionary
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
+        pluginResult.setKeepCallbackAsBool(true);
+        self.commandDelegate.sendPluginResult(pluginResult, callbackId: callbackId)
     }
     
     func initialize(command: CDVInvokedUrlCommand) {
@@ -83,14 +98,13 @@ class PhoneRTCPlugin : CDVPlugin {
             }
         }
     }
-
-    func send(callbackId: String, message: NSData) {
-        let json = NSJSONSerialization.JSONObjectWithData(message,
-            options: NSJSONReadingOptions.MutableLeaves,
-            error: nil) as NSDictionary
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
-        pluginResult.setKeepCallbackAsBool(true);
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId: callbackId)
+    
+    func send(command: CDVInvokedUrlCommand) {
+        let data: AnyObject? = command.argumentAtIndex(0)
+        let key = command.argumentAtIndex(1) as? String
+        if data != nil && key != nil {
+            self.sockets[key!]!.send(data!)
+        }
     }
 
     func toggleMute(command: CDVInvokedUrlCommand) {

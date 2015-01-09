@@ -170,30 +170,36 @@ function WebSocket(url, protocols) {
     setState(name);
     if(this[name]) {
       if(typeof this[name] === 'function') {
-        this[name].apply(self, data.parameters);
+        if(data.parameters) {
+          this[name].apply(self, data.parameters);
+        } else {
+          this[name].apply(self);
+        }
       } else {
         window.console.info(name + ' must be a function.');
       }
     }
   }
 
-  exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket', [url, protocols, this.sessionKey]);
+  // Make sure we don't cause grief.
+  if(!url) {
+    throw {
+      'name': 'InvalidArgumentException',
+      'message': 'Please specify a valid URL.'
+    };
+  }
+
+  exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket',
+       [url, protocols ? protocols : [], this.sessionKey]);
 }
 
 WebSocket.prototype.close = function (code, reason) {
-  exec(null, null, 'PhoneRTCPlugin', 'close', [{ 
-    'sessionKey': this.sessionKey
-    'code': code,
-    'reason': reason
-  }]);
+  exec(null, null, 'PhoneRTCPlugin', 'close', [code, reason, this.sessionKey]);
   this.readyState = this.CLOSING;
 };
 
 WebSocket.prototype.send = function (data) {
-  exec(null, null, 'PhoneRTCPlugin', 'send', [{ 
-    'sessionKey': this.sessionKey,
-    'data': data
-  }]);
+  exec(null, null, 'PhoneRTCPlugin', 'send', [data, this.sessionKey]);
 };
 
 exports.WebSocket = WebSocket;

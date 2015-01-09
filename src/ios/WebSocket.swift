@@ -35,8 +35,12 @@ class WebSocket {
         self.socket!.open()
     }
     
-    func close() {
-        self.socket!.close()
+    func close(code: Int?, reason: String?) {
+        if code != nil {
+            self.socket!.closeWithCode(code!, reason: reason)
+        } else {
+            self.socket!.close()
+        }
         self.plugin.destroyWebSocket(self.sessionKey)
     }
     

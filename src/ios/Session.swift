@@ -99,7 +99,7 @@ class Session {
     }
     
     func send(message: NSData) {
-        self.plugin.send(self.callbackId, message: message)
+        self.plugin.dispatch(self.callbackId, message: message)
     }
 
     func toggleMute(mute: Bool) {
