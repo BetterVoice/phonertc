@@ -17,12 +17,10 @@ class PhoneRTCPlugin : CDVPlugin {
     
     func createSession(command: CDVInvokedUrlCommand) {
         if let sessionKey = command.argumentAtIndex(0) as? String {
-            // create a session and initialize it.
             if let args: AnyObject = command.argumentAtIndex(1) {
                 let config = SessionConfig(data: args)
-                let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
-                    config: config, callbackId: command.callbackId,
-                    sessionKey: sessionKey)
+                let session = Session(config: config, peerConnectionFactory: peerConnectionFactory,
+                    plugin: self, callbackId: command.callbackId, sessionKey: sessionKey)
                 sessions[sessionKey] = session
             }
         }
@@ -30,6 +28,25 @@ class PhoneRTCPlugin : CDVPlugin {
 
     func destroySession(sessionKey: String) {
         self.sessions.removeValueForKey(sessionKey)
+    }
+
+    func createWebSocket(command: CDVInvokedUrlCommand) {
+        if let sessionKey = command.argumentAtIndex(0) as? String {
+            if let args: AnyObject = command.argumentAtIndex(1) {
+                if let url = args.objectForKey("url") as? String {
+                    let protocols = args.objectForKey("protocols") as? [String]
+                    let socket = WebSocket(url: url, protocols: protocols,
+                        plugin: self, callbackId: command.callbackId, 
+                        sessionKey: sessionKey)
+                    socket.open();
+                    sockets[sessionKey] = socket
+                }
+            }
+        }
+    }
+
+    func destroyWebSocket(sessionKey: String) {
+        self.sockets.removeValueForKey(sessionKey)
     }
 
     func disconnect(command: CDVInvokedUrlCommand) {

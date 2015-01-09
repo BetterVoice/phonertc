@@ -15,9 +15,9 @@ class Session {
     var stream: RTCMediaStream?
     var track: RTCAudioTrack?
     
-    init(plugin: PhoneRTCPlugin,
+    init(config: SessionConfig,
          peerConnectionFactory: RTCPeerConnectionFactory,
-         config: SessionConfig,
+         plugin: PhoneRTCPlugin,
          callbackId: String,
          sessionKey: String) {
         self.plugin = plugin
