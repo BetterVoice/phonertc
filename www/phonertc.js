@@ -35,14 +35,6 @@ function Session(config) {
   self.config = config;
   self.sessionKey = createUUID();
 
-  // make all config properties accessible from this object
-  Object.keys(config).forEach(function (prop) {
-    Object.defineProperty(self, prop, {
-      get: function () { return self.config[prop]; },
-      set: function (value) { self.config[prop] = value; }
-    });
-  });
-
   function callEvent(eventName) {
     if (!self.events[eventName]) {
       return;
@@ -148,3 +140,60 @@ Session.prototype.unmute = function () {
 };
 
 exports.Session = Session;
+
+function WebSocket(url, protocols) {
+  var self = this;
+  // Web socket states.
+  this.CONNECTING = 0;
+  this.OPEN = 1;
+  this.CLOSING = 2;
+  this.CLOSED = 3;
+  // Runtime state.
+  this.binaryType = 'blob';
+  this.bufferedAmount = 0;
+  this.extensions = '';
+  this.protocol = '';
+  this.readyState = this.CONNECTING;
+  this.sessionKey = createUUID();
+
+  function setState(callback) {
+    if(name === 'onopen') {
+      this.readyState = this.OPEN;
+    } else if(name === 'onclose' ||
+              name === 'onerror') {
+      this.readyState = this.CLOSED;
+    }
+  }
+
+  function onMessage(data) {
+    var name = data.name;
+    setState(name);
+    if(this[name]) {
+      if(typeof this[name] === 'function') {
+        this[name].apply(self, data.parameters);
+      } else {
+        window.console.info(name + ' must be a function.');
+      }
+    }
+  }
+
+  exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket', [url, protocols, this.sessionKey]);
+}
+
+WebSocket.prototype.close = function (code, reason) {
+  exec(null, null, 'PhoneRTCPlugin', 'close', [{ 
+    'sessionKey': this.sessionKey
+    'code': code,
+    'reason': reason
+  }]);
+  this.readyState = this.CLOSING;
+};
+
+WebSocket.prototype.send = function (data) {
+  exec(null, null, 'PhoneRTCPlugin', 'send', [{ 
+    'sessionKey': this.sessionKey,
+    'data': data
+  }]);
+};
+
+exports.WebSocket = WebSocket;
