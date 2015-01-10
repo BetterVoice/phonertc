@@ -165,8 +165,8 @@ function WebSocket(url, protocols) {
     window.console.log(data);
     var name = data.name;
     setState(name);
-    if(name === 'onmessage') { window.console.log('\\n index: ' + data.parameters.indexOf('\n')); }
-    if(name === 'onmessage') { window.console.log('\\r\\n index: ' + data.parameters.indexOf('\r\n')); }
+    if(name === 'onmessage') { window.console.log('\\n index: ' + data.parameters[0].indexOf('\n')); }
+    if(name === 'onmessage') { window.console.log('\\r\\n index: ' + data.parameters[0].indexOf('\r\n')); }
     if(self[name]) {
       if(typeof self[name] === 'function') {
         if(data.parameters) {
