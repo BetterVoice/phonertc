@@ -189,8 +189,7 @@ function WebSocket(url, protocols) {
     };
   }
 
-  exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket',
-       [url, protocols ? protocols : [], this.sessionKey]);
+  exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket', [url, protocols, this.sessionKey]);
 }
 
 WebSocket.prototype.close = function (code, reason) {

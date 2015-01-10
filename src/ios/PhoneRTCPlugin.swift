@@ -33,7 +33,7 @@ class PhoneRTCPlugin : CDVPlugin {
     func createWebSocket(command: CDVInvokedUrlCommand) {
         let url = command.argumentAtIndex(0) as? String
         let protocols = command.argumentAtIndex(1) as? [String]
-        let key = command.argumentAtIndex(3) as? String
+        let key = command.argumentAtIndex(2) as? String
         if url != nil && key != nil {
             let socket = WebSocket(url: url!, protocols: protocols,
                 plugin: self, callbackId: command.callbackId,
@@ -49,7 +49,7 @@ class PhoneRTCPlugin : CDVPlugin {
     func close(command: CDVInvokedUrlCommand) {
         let code = command.argumentAtIndex(0) as? Int
         let reason = command.argumentAtIndex(1) as? String
-        let key = command.argumentAtIndex(3) as? String
+        let key = command.argumentAtIndex(2) as? String
         if key != nil {
             self.sockets[key!]!.close(code, reason: reason)
         }
