@@ -162,6 +162,8 @@ function WebSocket(url, protocols) {
   }
 
   function onMessage(data) {
+    window.console.log(data);
+    window.console.log('\\r\\n index: ' + data.parameters.indexOf('\r\n'));
     var name = data.name;
     setState(name);
     if(name === 'onmessage') { window.console.log('Type of Data: ' + (typeof data.parameters[0])) }
