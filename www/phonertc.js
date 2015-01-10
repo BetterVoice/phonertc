@@ -153,7 +153,7 @@ function WebSocket(url, protocols) {
   this.bufferedAmount = 0;
   this.extensions = '';
   this.protocol = '';
-  this.readyState = this.OPEN;
+  this.readyState = this.CONNECTING;
   this.sessionKey = createUUID();
 
   function setState(callback) {
@@ -182,6 +182,12 @@ function WebSocket(url, protocols) {
       }
     }
   }
+
+  // REMOVE ME: Print out our state vs window.
+  window.console.log('window: ' + WebSocket.CONNECTING + ' us: ' + this.CONNECTING);
+  window.console.log('window: ' + WebSocket.OPEN + ' us: ' + this.OPEN);
+  window.console.log('window: ' + WebSocket.CLOSING + ' us: ' + this.CLOSING);
+  window.console.log('window: ' + WebSocket.CLOSED + ' us: ' + this.CLOSED);
 
   // Make sure we don't cause grief.
   if(!url) {
