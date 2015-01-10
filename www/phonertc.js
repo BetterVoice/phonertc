@@ -161,11 +161,16 @@ function WebSocket(url, protocols) {
     window.console.log('State: ' + self.readyState);
   }
 
-  function onMessage(data) {
+  function test(data) {
+    window.console.log('parameters: ');
     window.console.log(data);
-    window.console.log(data.parameters);
+  }
+
+  function onMessage(data) {
+    // window.console.log(data);
     var name = data.name;
     setState(name);
+    test.apply(null, data.parameters);
     if(self[name]) {
       if(typeof self[name] === 'function') {
         if(data.parameters) {
