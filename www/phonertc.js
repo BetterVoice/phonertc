@@ -169,11 +169,16 @@ function WebSocket(url, protocols) {
     window.console.log(data);
     var name = data.name;
     setState(name);
+    window.console.log('state: ' + this.readyState);
     if(this[name]) {
+      window.console.log('We have a listener.');
       if(typeof this[name] === 'function') {
+        window.console.log('The listener is a function.');
         if(data.parameters) {
+          window.console.log('The listener has parameters.');
           this[name].apply(self, data.parameters);
         } else {
+          window.console.log('The listener does not have parameters.');
           this[name].apply(self);
         }
       } else {
