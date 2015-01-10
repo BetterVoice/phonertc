@@ -151,7 +151,7 @@ function WebSocket(url, protocols) {
   this.readyState = WebSocket.CONNECTING;
   this.sessionKey = createUUID();
 
-  function test(parameters) 
+  function test(parameters) {
     window.console.log('parameters: ' + parameters);
     window.console.log('type of paramters: ' + (typeof parameters));
     window.console.log('new line index: ' + parameters.indexOf('\r\n'));
