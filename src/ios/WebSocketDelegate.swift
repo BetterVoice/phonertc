@@ -31,7 +31,7 @@ class WebSocketDelegate : NSObject, SRWebSocketDelegate {
     }
     
     func webSocket(websocket: SRWebSocket!, didFailWithError error: NSError!) {
-        println("INFO: A Web Socket has failed with a fatal error.")
+        println("INFO: A Web Socket has failed with an error.")
         let json: AnyObject = [
             "name": "onerror",
             "parameters": [error.localizedDescription]
@@ -50,7 +50,7 @@ class WebSocketDelegate : NSObject, SRWebSocketDelegate {
         }
         let json: AnyObject = [
             "name": "onclose",
-            "parameters": object
+            "parameters": [object]
         ]
         dispatch(json)
     }
@@ -60,7 +60,7 @@ class WebSocketDelegate : NSObject, SRWebSocketDelegate {
         let object: AnyObject = ["data": message]
         let json: AnyObject = [
             "name": "onmessage",
-            "parameters": object
+            "parameters": [object]
         ]
         dispatch(json)
     }
