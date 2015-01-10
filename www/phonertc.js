@@ -157,13 +157,10 @@ function WebSocket(url, protocols) {
   this.sessionKey = createUUID();
 
   function setState(callback) {
-    console.log('Name: ' + name);
-    if(name === 'onopen') {
+    if(callback === 'onopen') {
       self.readyState = self.OPEN;
-      console.log('The state should be set to open.');
-      console.log('State: ' + self.readyState);
-    } else if(name === 'onclose' ||
-              name === 'onerror') {
+    } else if(callback === 'onclose' ||
+              callback === 'onerror') {
       self.readyState = self.CLOSED;
     }
   }
