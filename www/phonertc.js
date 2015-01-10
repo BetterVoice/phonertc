@@ -153,7 +153,7 @@ function WebSocket(url, protocols) {
   this.bufferedAmount = 0;
   this.extensions = '';
   this.protocol = '';
-  this.readyState = this.CONNECTING;
+  this.readyState = this.OPEN;
   this.sessionKey = createUUID();
 
   function setState(callback) {
