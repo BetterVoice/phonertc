@@ -42,18 +42,25 @@ class WebSocketDelegate : NSObject, SRWebSocketDelegate {
     func webSocket(webSocket: SRWebSocket!, didCloseWithCode code: NSInteger!,
                    reason: NSString!, wasClean: Boolean!) {
         println("INFO: A Web Socket has been closed with code \"\(code)\" and reason \"\(reason)\".")
+        var object: AnyObject
+        if(wasClean != nil) {
+            object = ["code": code, "reason": reason, "wasClean": true]
+        } else {
+            object = ["code": code, "reason": reason, "wasClean": false]
+        }
         let json: AnyObject = [
             "name": "onclose",
-            "parameters": [code, reason]
+            "parameters": object
         ]
         dispatch(json)
     }
     
     func webSocket(webSocket: SRWebSocket!, didReceiveMessage message: AnyObject!) {
         println("INFO: Received a message: \(message)")
+        let object: AnyObject = ["data": message]
         let json: AnyObject = [
             "name": "onmessage",
-            "parameters": [message]
+            "parameters": object
         ]
         dispatch(json)
     }
