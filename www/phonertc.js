@@ -185,7 +185,7 @@ function WebSocket(url, protocols) {
   }
 
   exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket', [url, protocols, this.sessionKey]);
-}
+};
 
 // Define static variables.
 WebSocket.CONNECTING = 0;
@@ -204,3 +204,40 @@ WebSocket.prototype.send = function (data) {
 };
 
 exports.WebSocket = WebSocket;
+
+function BackgroundTimer(timeout) {
+  var self = this;
+  // Runtime state.
+  this.timeout = timeout;
+  // Make sure we don't cause grief.
+  if(!timeout || typeof timeout !== 'number') {
+    throw {
+      'name': 'InvalidArgumentException',
+      'message': 'Please specify a valid timeout period.'
+    };
+  }
+  // Start the timer.
+  function onMessage(data) {
+    var name = data.name;
+    setState(name);
+    if(self[name]) {
+      if(typeof self[name] === 'function') {
+        if(data.parameters) {
+          self[name].apply(self, data.parameters);
+        } else {
+          self[name].apply(self);
+        }
+      } else {
+        window.console.info(name + ' must be a function.');
+      }
+    }
+  }
+
+  exec(onMessage, null, 'PhoneRTCPlugin', 'registerHandler', [timeout]);
+};
+
+BackgroundTimer.prototype.destroy = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'unregisterHandler', []);
+};
+
+exports.BackgroundTimer = BackgroundTimer;

@@ -3,11 +3,13 @@ import AVFoundation
 
 @objc(PhoneRTCPlugin)
 class PhoneRTCPlugin : CDVPlugin {
+    var application: UIApplication
     var peerConnectionFactory: RTCPeerConnectionFactory
     var sessions: [String: Session]
     var sockets: [String: WebSocket]
     
     override init(webView: UIWebView) {
+        application = UIApplication.sharedApplication()
         peerConnectionFactory = RTCPeerConnectionFactory()
         RTCPeerConnectionFactory.initializeSSL()
         sessions = [:]
@@ -99,6 +101,15 @@ class PhoneRTCPlugin : CDVPlugin {
         }
     }
     
+    func registerHandler(command: CDVInvokedUrlCommand) {
+        let timeout = command.argumentAtIndex(0) as? Double
+        if timeout != nil {
+            self.application.setKeepAliveTimeout(timeout!, handler: {() -> Void in
+                self.dispatch(command.callbackId, message: "{\"name\": \"ontimeout\"}".dataUsingEncoding(NSUTF8StringEncoding)!)
+            })
+        }
+    }
+    
     func send(command: CDVInvokedUrlCommand) {
         let data: AnyObject? = command.argumentAtIndex(0)
         let key = command.argumentAtIndex(1) as? String
@@ -118,5 +129,9 @@ class PhoneRTCPlugin : CDVPlugin {
                 }
             }
         }
+    }
+    
+    func unregisterHandler(command: CDVInvokedUrlCommand) {
+        self.application.clearKeepAliveTimeout()
     }
 }
