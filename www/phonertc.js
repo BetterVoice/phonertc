@@ -161,6 +161,7 @@ function WebSocket(url, protocols) {
   }
 
   function onMessage(data) {
+    window.console.log(data);
     var name = data.name;
     setState(name);
     if(self[name]) {
