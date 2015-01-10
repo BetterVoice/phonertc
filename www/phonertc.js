@@ -200,6 +200,13 @@ function WebSocket(url, protocols) {
   exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket', [url, protocols, this.sessionKey]);
 }
 
+// Define static variables.
+WebSocket.CONNECTING = 0;
+WebSocket.OPEN = 1;
+WebSocket.CLOSING = 2;
+WebSocket.CLOSED = 3;
+
+// Define object methods.
 WebSocket.prototype.close = function (code, reason) {
   exec(null, null, 'PhoneRTCPlugin', 'close', [code, reason, this.sessionKey]);
   this.readyState = this.CLOSING;
