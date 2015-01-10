@@ -164,7 +164,7 @@ function WebSocket(url, protocols) {
   function onMessage(data) {
     var name = data.name;
     setState(name);
-    if(name === 'onmessage') { window.console.log('Type of Data: ' + (typeof data.parameters)) }
+    if(name === 'onmessage') { window.console.log('Type of Data: ' + (typeof data.parameters[0])) }
     if(self[name]) {
       if(typeof self[name] === 'function') {
         if(data.parameters) {
