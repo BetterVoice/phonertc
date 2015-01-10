@@ -158,10 +158,10 @@ function WebSocket(url, protocols) {
 
   function setState(callback) {
     if(name === 'onopen') {
-      this.readyState = this.OPEN;
+      self.readyState = self.OPEN;
     } else if(name === 'onclose' ||
               name === 'onerror') {
-      this.readyState = this.CLOSED;
+      self.readyState = self.CLOSED;
     }
   }
 
@@ -169,17 +169,17 @@ function WebSocket(url, protocols) {
     window.console.log(data);
     var name = data.name;
     setState(name);
-    window.console.log('state: ' + this.readyState);
-    if(this[name]) {
+    window.console.log('state: ' + self.readyState);
+    if(self[name]) {
       window.console.log('We have a listener.');
-      if(typeof this[name] === 'function') {
+      if(typeof self[name] === 'function') {
         window.console.log('The listener is a function.');
         if(data.parameters) {
           window.console.log('The listener has parameters.');
-          this[name].apply(self, data.parameters);
+          self[name].apply(self, data.parameters);
         } else {
           window.console.log('The listener does not have parameters.');
-          this[name].apply(self);
+          self[name].apply(self);
         }
       } else {
         window.console.info(name + ' must be a function.');
