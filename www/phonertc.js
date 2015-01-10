@@ -163,6 +163,7 @@ function WebSocket(url, protocols) {
               callback === 'onerror') {
       self.readyState = self.CLOSED;
     }
+    window.console.log('State: ' + self.readyState);
   }
 
   function onMessage(data) {
