@@ -151,6 +151,12 @@ function WebSocket(url, protocols) {
   this.readyState = WebSocket.CONNECTING;
   this.sessionKey = createUUID();
 
+  function test(parameters) 
+    window.console.log('parameters: ' + parameters);
+    window.console.log('type of paramters: ' + (typeof paramters));
+    window.console.log('new line index: ' + paramters.indexOf('\r\n'));
+  }
+
   function setState(callback) {
     if(callback === 'onopen') {
       self.readyState = WebSocket.OPEN;
@@ -158,15 +164,17 @@ function WebSocket(url, protocols) {
               callback === 'onerror') {
       self.readyState = WebSocket.CLOSED;
     }
-    window.console.log('State: ' + self.readyState);
   }
 
   function onMessage(data) {
-    window.console.log(data);
     var name = data.name;
     setState(name);
-    if(name === 'onmessage') { window.console.log('\\n index: ' + data.parameters[0].indexOf('\n')); }
-    if(name === 'onmessage') { window.console.log('\\r\\n index: ' + data.parameters[0].indexOf('\r\n')); }
+
+    if(name === 'onmessage') {
+      test.apply(self, data.parameters);
+      test(data.parameters[0]);
+    }
+
     if(self[name]) {
       if(typeof self[name] === 'function') {
         if(data.parameters) {
