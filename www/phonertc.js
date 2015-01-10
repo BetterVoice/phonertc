@@ -165,7 +165,7 @@ function WebSocket(url, protocols) {
     window.console.log(data);
     var name = data.name;
     setState(name);
-    if(name === 'onmessage') { data.parameters[0] = data.parameters[0].replace(/(\r)?\n/g, "\r\n"); }
+    if(name === 'onmessage') { window.console.log('\\n index: ' + data.parameters.indexOf('\n')); }
     if(name === 'onmessage') { window.console.log('\\r\\n index: ' + data.parameters.indexOf('\r\n')); }
     if(self[name]) {
       if(typeof self[name] === 'function') {
