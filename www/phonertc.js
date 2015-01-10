@@ -157,8 +157,11 @@ function WebSocket(url, protocols) {
   this.sessionKey = createUUID();
 
   function setState(callback) {
+    console.log('Name: ' + name);
     if(name === 'onopen') {
       self.readyState = self.OPEN;
+      console.log('The state should be set to open.');
+      console.log('State: ' + self.readyState);
     } else if(name === 'onclose' ||
               name === 'onerror') {
       self.readyState = self.CLOSED;
@@ -169,16 +172,11 @@ function WebSocket(url, protocols) {
     window.console.log(data);
     var name = data.name;
     setState(name);
-    window.console.log('state: ' + self.readyState);
     if(self[name]) {
-      window.console.log('We have a listener.');
       if(typeof self[name] === 'function') {
-        window.console.log('The listener is a function.');
         if(data.parameters) {
-          window.console.log('The listener has parameters.');
           self[name].apply(self, data.parameters);
         } else {
-          window.console.log('The listener does not have parameters.');
           self[name].apply(self);
         }
       } else {
