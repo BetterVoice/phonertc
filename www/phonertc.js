@@ -161,16 +161,9 @@ function WebSocket(url, protocols) {
     window.console.log('State: ' + self.readyState);
   }
 
-  function test(data) {
-    window.console.log('parameters: ');
-    window.console.log(data);
-  }
-
   function onMessage(data) {
-    // window.console.log(data);
     var name = data.name;
     setState(name);
-    test.apply(null, data.parameters);
     if(self[name]) {
       if(typeof self[name] === 'function') {
         if(data.parameters) {
@@ -208,7 +201,6 @@ WebSocket.prototype.close = function (code, reason) {
 };
 
 WebSocket.prototype.send = function (data) {
-  window.console.log(data);
   exec(null, null, 'PhoneRTCPlugin', 'send', [data, this.sessionKey]);
 };
 
