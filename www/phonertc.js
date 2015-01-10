@@ -143,31 +143,27 @@ exports.Session = Session;
 
 function WebSocket(url, protocols) {
   var self = this;
-  // Web socket states.
-  this.CONNECTING = 0;
-  this.OPEN = 1;
-  this.CLOSING = 2;
-  this.CLOSED = 3;
   // Runtime state.
   this.binaryType = 'blob';
   this.bufferedAmount = 0;
   this.extensions = '';
   this.protocol = '';
-  this.readyState = this.CONNECTING;
+  this.readyState = WebSocket.CONNECTING;
   this.sessionKey = createUUID();
 
   function setState(callback) {
     if(callback === 'onopen') {
-      self.readyState = self.OPEN;
+      self.readyState = WebSocket.OPEN;
     } else if(callback === 'onclose' ||
               callback === 'onerror') {
-      self.readyState = self.CLOSED;
+      self.readyState = WebSocket.CLOSED;
     }
     window.console.log('State: ' + self.readyState);
   }
 
   function onMessage(data) {
     window.console.log(data);
+    window.console.log(data.parameters);
     var name = data.name;
     setState(name);
     if(self[name]) {
@@ -182,12 +178,6 @@ function WebSocket(url, protocols) {
       }
     }
   }
-
-  // REMOVE ME: Print out our state vs window.
-  window.console.log('window: ' + WebSocket.CONNECTING + ' us: ' + this.CONNECTING);
-  window.console.log('window: ' + WebSocket.OPEN + ' us: ' + this.OPEN);
-  window.console.log('window: ' + WebSocket.CLOSING + ' us: ' + this.CLOSING);
-  window.console.log('window: ' + WebSocket.CLOSED + ' us: ' + this.CLOSED);
 
   // Make sure we don't cause grief.
   if(!url) {
@@ -209,10 +199,11 @@ WebSocket.CLOSED = 3;
 // Define object methods.
 WebSocket.prototype.close = function (code, reason) {
   exec(null, null, 'PhoneRTCPlugin', 'close', [code, reason, this.sessionKey]);
-  this.readyState = this.CLOSING;
+  this.readyState = WebSocket.CLOSING;
 };
 
 WebSocket.prototype.send = function (data) {
+  window.console.log(data);
   exec(null, null, 'PhoneRTCPlugin', 'send', [data, this.sessionKey]);
 };
 
