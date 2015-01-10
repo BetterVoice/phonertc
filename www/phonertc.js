@@ -153,8 +153,8 @@ function WebSocket(url, protocols) {
 
   function test(parameters) 
     window.console.log('parameters: ' + parameters);
-    window.console.log('type of paramters: ' + (typeof paramters));
-    window.console.log('new line index: ' + paramters.indexOf('\r\n'));
+    window.console.log('type of paramters: ' + (typeof parameters));
+    window.console.log('new line index: ' + parameters.indexOf('\r\n'));
   }
 
   function setState(callback) {
