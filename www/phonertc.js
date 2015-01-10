@@ -191,6 +191,8 @@ function WebSocket(url, protocols) {
 
   exec(onMessage, null, 'PhoneRTCPlugin', 'createWebSocket',
        [url, protocols ? protocols : [], this.sessionKey]);
+
+  window.console.log('Created Native Web Socket.');
 }
 
 WebSocket.prototype.close = function (code, reason) {
