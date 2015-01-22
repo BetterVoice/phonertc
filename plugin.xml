@@ -33,8 +33,11 @@ In order to install PhoneRTC on iOS, please follow these steps:
            [ProjectName]/Plugins/com.dooble.phonertc/Bridging-Header.h
       `Runpath Search Paths` => 
            $(inherited) @executable_path/Frameworks
-
 5) Repeat step #4 for the CordovaLib project
+6) Download the WebRTC framework libs from:
+   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-arm-intel-Debug.a
+   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-ios-armeabi_v7a-Debug.a
+   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-ios-x86-Debug.a
 </info>
 
         <config-file target="config.xml" parent="/*">
