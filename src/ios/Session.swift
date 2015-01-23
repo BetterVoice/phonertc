@@ -47,9 +47,9 @@ class Session {
     
     func initialize() {
         // Define ICE servers.
-        let url = NSURL(string: "turn:54.94.234.154")
-        let user = "bettervoice"
-        let pw = "nopassword"
+        let url = NSURL(string: "stun:stun.l.google.com:19302")
+        let user = ""
+        let pw = ""
         let iceServers = [RTCICEServer(URI: url, username: user, password: pw)]
         // Initialize the peer connection.
         self.peerConnectionObserver = PCObserver(session: self)
@@ -84,7 +84,7 @@ class Session {
                         if let sdpString = object.objectForKey("sdp") as? String {
                             let sdp = RTCSessionDescription(type: type, sdp: sdpString)
                             self.peerConnection.setRemoteDescriptionWithDelegate(SessionDescriptionDelegate(session: self),
-                                                                                 sessionDescription: sdp)
+                                                                                 sessionDescription: sdp!)
                         }
                     default:
                         println("ERROR: Invalid message \(message)")
