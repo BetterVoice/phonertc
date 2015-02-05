@@ -82,6 +82,9 @@ class Session {
                 switch type {
                     case "offer", "answer":
                         if let sdpString = object.objectForKey("sdp") as? String {
+                            if self.peerConnection == nil {
+                                self.initialize()
+                            }
                             let sdp = RTCSessionDescription(type: type, sdp: sdpString)
                             self.peerConnection.setRemoteDescriptionWithDelegate(SessionDescriptionDelegate(session: self),
                                                                                  sessionDescription: sdp!)
