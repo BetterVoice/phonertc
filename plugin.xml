@@ -34,16 +34,15 @@ In order to install PhoneRTC on iOS, please follow these steps:
       `Build Active Architecture Only` => No
       `Objective-C Bridging Header` => 
            [ProjectName]/Plugins/com.dooble.phonertc/Bridging-Header.h
+      `Swift Optimization Level` => -Onone
       `Runpath Search Paths` => 
            $(inherited) @executable_path/Frameworks
 
 5) Repeat step #4 for the CordovaLib project
-6) Download the WebRTC framework libs from:
-   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-arm-intel-Debug.a (x86+arm)
-   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-ios-armeabi_v7a-Debug.a (arm 32bit)
-   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-ios-x86-Debug.a (Simulator)
-   http://s3.bettervoice.com/webrtclibs/libWebRTC-7958-ios-arm64_v8a-Debug.a (arm 64bit)
+6) Download the WebRTC unified (32 & 64 bit) framework lib from:
+   http://s3.bettervoice.com/webrtclibs/webrtc-ios-unified.a (x86+arm)
 7) Add the downloaded library as a framework to your iOS Xcode project.
+8) Enable Audio + VoIP Background Modes
         ---------------------
         </info>
 
